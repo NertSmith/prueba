@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Servidores HP</title>
+    <style>
+        body { font-family: sans-serif; padding: 2em; }
+        nav a { margin-right: 15px; cursor: pointer; color: blue; text-decoration: underline; }
+        #resultados { margin-top: 20px; border: 1px solid #ccc; padding: 10px; min-height: 100px; }
+        .loading { font-style: italic; color: #888; }
+    </style>
+</head>
+<body>
+
+    <h1>Mi Portal de Partes de Servidores</h1>
+    <nav>
+        <a data-serie="dl-series">HP Proliant DL Series</a>
+        <a data-serie="ml-series">HP Proliant ML Series</a>
+        </nav>
+
+    <hr>
+
+    <div id="resultados">
+        <p>Selecciona una serie para ver los modelos compatibles.</p>
+    </div>
+
+    <script>
+        // Seleccionamos todos los enlaces de la navegación
+        const navLinks = document.querySelectorAll('nav a');
+        const resultadosDiv = document.getElementById('resultados');
+
+        // Para cada enlace, añadimos un "detector de clics"
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const serie = link.dataset.serie;
+                
+                // 1. Mostramos un mensaje de "Cargando..."
+                resultadosDiv.innerHTML = '<p class="loading">Buscando datos...</p>';
+
+                // 2. Llamamos a nuestra función de backend (la API)
+                // Esta URL será la de tu Función Serverless en Netlify
+                fetch(`/.netlify/functions/scraper?serie=${serie}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // 3. Limpiamos el div de resultados
+                        resultadosDiv.innerHTML = ''; 
+
+                        // 4. Creamos una lista con los datos recibidos
+                        const ul = document.createElement('ul');
+                        data.modelos.forEach(modelo => {
+                            const li = document.createElement('li');
+                            // Creamos un enlace real con la URL base del sitio original
+                            li.innerHTML = `<a href="${modelo.url}" target="_blank">${modelo.nombre}</a>`;
+                            ul.appendChild(li);
+                        });
+                        resultadosDiv.appendChild(ul);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener los datos:', error);
+                        resultadosDiv.innerHTML = '<p style="color:red;">Hubo un error al cargar los datos.</p>';
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
