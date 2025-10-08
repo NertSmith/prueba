@@ -1,3 +1,2 @@
-# netlify.toml
 [build]
-  functions = "netlify/functions/" # Le dice dónde están tus funciones
+  functions = "netlify/functions/"
