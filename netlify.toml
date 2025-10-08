@@ -1,2 +1,3 @@
+# CORRECTO
 [build]
-  functions = "netlify/functions/"
+functions = "netlify/functions/"
